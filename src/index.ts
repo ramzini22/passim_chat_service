@@ -7,6 +7,7 @@ import { Envs } from './common/envs/env';
 import { MigrationService } from './common/config/mikro-orm/migration.service';
 import { logger } from './common/logger/logger';
 import { useSwagger } from './common/swagger/swagger';
+import { SocketIdInterceptor } from './common/interceptors/socket-id.interceptor';
 
 export class App {
     private readonly ADDRESS: string;
@@ -27,7 +28,7 @@ export class App {
         }
 
         app.enableCors({ origin: true, credentials: true });
-
+        app.useGlobalInterceptors(new SocketIdInterceptor());
         app.useGlobalPipes(
             new ValidationPipe({
                 validateCustomDecorators: true,

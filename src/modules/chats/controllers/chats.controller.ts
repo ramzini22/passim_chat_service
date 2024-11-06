@@ -1,34 +1,32 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
-import { ApiOkResponse } from '@nestjs/swagger';
+import { Body, Get, Param, Post, Query } from '@nestjs/common';
 import { ChatsService } from '../services/chats.service';
 import { CreateOpenChatDto } from '../dto/requests/create-open-chat.dto';
 import { QueryGetChatsDto } from '../dto/requests/query-get-chats.dto';
 import { ChatEntity } from '../entities/chat.entity';
 import { DataResponse } from '../../../common/swagger/data-response.dto';
+import { ApiController } from '../../../common/decorators/swagger/api-controller.decorator';
+import { ApiDataResponse } from '../../../common/decorators/swagger/api-data-response.decorator';
+import { SocketId } from '../../../common/decorators/requests/socket-id.decorator';
 
-@Controller('chats')
+@ApiController('chats')
 export class ChatsController {
     constructor(private readonly chatsService: ChatsService) {}
 
-    @ApiOkResponse({
-        type: ChatEntity,
-    })
     @Post()
-    createChat(@Body() body: CreateOpenChatDto): Promise<DataResponse<ChatEntity>> {
-        return this.chatsService.createOpenChat(body.title);
+    @ApiDataResponse(ChatEntity, 'создания чата')
+    createChat(@Body() body: CreateOpenChatDto, @SocketId() socketId?: string): Promise<DataResponse<ChatEntity>> {
+        return this.chatsService.createOpenChat(body.title, socketId);
     }
 
-    @ApiOkResponse({
-        type: ChatEntity,
-        isArray: true,
-    })
     @Get()
+    @ApiDataResponse(ChatEntity, 'получения чатов', true)
     async getChats(@Query() query: QueryGetChatsDto): Promise<DataResponse<ChatEntity[]>> {
         return await this.chatsService.getOpenChats(query.title, query.offset, query.limit);
     }
 
     @Get(':id')
-    async getChat(@Param('id') id: number): Promise<DataResponse<string | ChatEntity>> {
+    @ApiDataResponse(ChatEntity, 'получения чата по id')
+    async getChat(@Param('id') id: number): Promise<DataResponse<ChatEntity>> {
         return this.chatsService.findChat(id);
     }
 }

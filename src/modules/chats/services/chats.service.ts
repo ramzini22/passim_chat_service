@@ -3,22 +3,27 @@ import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository } from '@mikro-orm/postgresql';
 import { ChatEntity } from '../entities/chat.entity';
 import { DataResponse } from '../../../common/swagger/data-response.dto';
+import { QueueService } from '../../queue/queue.service';
+import { EventsEnum } from '../../queue/types/events.enum';
 
 @Injectable()
 export class ChatsService {
     constructor(
         @InjectRepository(ChatEntity)
         private readonly chatRepository: EntityRepository<ChatEntity>, // chatRepository - это объект для запросов в бд
+        private readonly queueService: QueueService,
     ) {}
 
-    async createOpenChat(title: string): Promise<DataResponse<ChatEntity>> {
-        const chatEntity = new ChatEntity();
-
-        chatEntity.title = title;
+    async createOpenChat(title: string, socketId?: string): Promise<DataResponse<ChatEntity>> {
+        const chatEntity = new ChatEntity(title);
 
         await this.chatRepository.insert(chatEntity);
 
-        return new DataResponse(chatEntity);
+        const response = new DataResponse<ChatEntity>(chatEntity);
+
+        this.queueService.sendMessage(socketId, EventsEnum.CREATE_CHAT, response);
+
+        return response;
     }
 
     async getOpenChats(title: string, offset: number, limit?: number): Promise<DataResponse<ChatEntity[]>> {
@@ -49,13 +54,13 @@ export class ChatsService {
         }
     }
 
-    async findChat(id: number): Promise<DataResponse<string | ChatEntity>> {
+    async findChat(id: number): Promise<DataResponse<ChatEntity>> {
         const chat = await this.chatRepository.findOne(id);
 
         if (chat) {
-            return new DataResponse(chat);
+            return new DataResponse<ChatEntity>(chat);
         }
 
-        return new DataResponse(`Chat with ID' + ${id} + 'not found`);
+        return new DataResponse<ChatEntity>(`Chat with ID' + ${id} + 'not found`);
     }
 }

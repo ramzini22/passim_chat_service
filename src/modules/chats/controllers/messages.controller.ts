@@ -1,20 +1,19 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
-import { ApiOkResponse } from '@nestjs/swagger';
+import { Body, Get, Post, Query } from '@nestjs/common';
 import { CreateMessageDto } from '../dto/requests/create-post-message.dto';
 import { MessagesService } from '../services/messages.service';
 import { MessageEntity } from '../entities/message.entity';
 import { QueryGetMessagesDto } from '../dto/requests/query-get-messages.dto';
 import { DataResponse } from '../../../common/swagger/data-response.dto';
+import { ApiController } from '../../../common/decorators/swagger/api-controller.decorator';
+import { ApiDataResponse } from '../../../common/decorators/swagger/api-data-response.decorator';
 
-@Controller('messages')
+@ApiController('messages')
 export class MessagesController {
     constructor(private readonly messagesService: MessagesService) {}
 
-    @ApiOkResponse({
-        type: MessageEntity,
-    })
     @Post()
-    createMessage(@Body() message: CreateMessageDto): Promise<DataResponse<MessageEntity | string>> {
+    @ApiDataResponse(MessageEntity, 'создания сообщения')
+    createMessage(@Body() message: CreateMessageDto): Promise<DataResponse<MessageEntity>> {
         return this.messagesService.createMessage(
             message.encryptMessage,
             message.chatId,
@@ -23,11 +22,8 @@ export class MessagesController {
         );
     }
 
-    @ApiOkResponse({
-        type: MessageEntity,
-        isArray: true,
-    })
     @Get()
+    @ApiDataResponse(MessageEntity, 'получения сообщений', true)
     getMessages(@Query() query: QueryGetMessagesDto): Promise<DataResponse<MessageEntity[]>> {
         return this.messagesService.getMessages(query.chatId, query.limit, query.offset, query.search);
     }

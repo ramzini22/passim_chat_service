@@ -4,6 +4,8 @@
 		"/chats": {
 			"post": {
 				"operationId": "ChatsController_createChat",
+				"summary": "",
+				"description": "метод создания чата",
 				"parameters": [],
 				"requestBody": {
 					"required": true,
@@ -21,15 +23,28 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ChatEntity"
+									"properties": {
+										"success": {
+											"type": "boolean",
+											"description": "является ли запрос успешным"
+										},
+										"data": {
+											"$ref": "#/components/schemas/ChatEntity"
+										}
+									}
 								}
 							}
 						}
 					}
-				}
+				},
+				"tags": [
+					"chats"
+				]
 			},
 			"get": {
 				"operationId": "ChatsController_getChats",
+				"summary": "",
+				"description": "метод получения чатов",
 				"parameters": [
 					{
 						"name": "title",
@@ -62,20 +77,33 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"type": "array",
-									"items": {
-										"$ref": "#/components/schemas/ChatEntity"
+									"properties": {
+										"success": {
+											"type": "boolean",
+											"description": "является ли запрос успешным"
+										},
+										"data": {
+											"type": "array",
+											"items": {
+												"$ref": "#/components/schemas/ChatEntity"
+											}
+										}
 									}
 								}
 							}
 						}
 					}
-				}
+				},
+				"tags": [
+					"chats"
+				]
 			}
 		},
 		"/chats/{id}": {
 			"get": {
 				"operationId": "ChatsController_getChat",
+				"summary": "",
+				"description": "метод получения чата по id",
 				"parameters": [
 					{
 						"name": "id",
@@ -88,14 +116,34 @@
 				],
 				"responses": {
 					"200": {
-						"description": ""
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"success": {
+											"type": "boolean",
+											"description": "является ли запрос успешным"
+										},
+										"data": {
+											"$ref": "#/components/schemas/ChatEntity"
+										}
+									}
+								}
+							}
+						}
 					}
-				}
+				},
+				"tags": [
+					"chats"
+				]
 			}
 		},
 		"/messages": {
 			"post": {
 				"operationId": "MessagesController_createMessage",
+				"summary": "",
+				"description": "метод создания сообщения",
 				"parameters": [],
 				"requestBody": {
 					"required": true,
@@ -113,15 +161,28 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/MessageEntity"
+									"properties": {
+										"success": {
+											"type": "boolean",
+											"description": "является ли запрос успешным"
+										},
+										"data": {
+											"$ref": "#/components/schemas/MessageEntity"
+										}
+									}
 								}
 							}
 						}
 					}
-				}
+				},
+				"tags": [
+					"messages"
+				]
 			},
 			"get": {
 				"operationId": "MessagesController_getMessages",
+				"summary": "",
+				"description": "метод получения сообщений",
 				"parameters": [
 					{
 						"name": "chatId",
@@ -170,15 +231,26 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"type": "array",
-									"items": {
-										"$ref": "#/components/schemas/MessageEntity"
+									"properties": {
+										"success": {
+											"type": "boolean",
+											"description": "является ли запрос успешным"
+										},
+										"data": {
+											"type": "array",
+											"items": {
+												"$ref": "#/components/schemas/MessageEntity"
+											}
+										}
 									}
 								}
 							}
 						}
 					}
-				}
+				},
+				"tags": [
+					"messages"
+				]
 			}
 		}
 	},
@@ -195,23 +267,12 @@
 	"tags": [],
 	"servers": [
 		{
-			"url": "http://localhost:7020",
+			"url": "http://localhost:6020",
 			"description": "development"
 		}
 	],
 	"components": {
 		"schemas": {
-			"CreateOpenChatDto": {
-				"type": "object",
-				"properties": {
-					"title": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"title"
-				]
-			},
 			"ChatEntity": {
 				"type": "object",
 				"properties": {
@@ -244,27 +305,15 @@
 					"type"
 				]
 			},
-			"CreateMessageDto": {
+			"CreateOpenChatDto": {
 				"type": "object",
 				"properties": {
-					"encryptMessage": {
+					"title": {
 						"type": "string"
-					},
-					"chatId": {
-						"type": "number"
-					},
-					"message": {
-						"type": "string"
-					},
-					"parentMessageId": {
-						"type": "number"
 					}
 				},
 				"required": [
-					"encryptMessage",
-					"chatId",
-					"message",
-					"parentMessageId"
+					"title"
 				]
 			},
 			"MessageEntity": {
@@ -299,6 +348,29 @@
 					"encryptMessage",
 					"chatId",
 					"number",
+					"message",
+					"parentMessageId"
+				]
+			},
+			"CreateMessageDto": {
+				"type": "object",
+				"properties": {
+					"encryptMessage": {
+						"type": "string"
+					},
+					"chatId": {
+						"type": "number"
+					},
+					"message": {
+						"type": "string"
+					},
+					"parentMessageId": {
+						"type": "number"
+					}
+				},
+				"required": [
+					"encryptMessage",
+					"chatId",
 					"message",
 					"parentMessageId"
 				]

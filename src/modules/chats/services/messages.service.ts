@@ -20,7 +20,7 @@ export class MessagesService {
         chatId: number,
         message: string,
         parentMessageId?: number,
-    ): Promise<DataResponse<MessageEntity | string>> {
+    ): Promise<DataResponse<MessageEntity>> {
         const chat = await this.chatRepository.findOne({ id: chatId });
 
         if (chat) {
@@ -30,7 +30,7 @@ export class MessagesService {
                 const parentMessage = await this.messageRepository.findOne({ id: parentMessageId });
 
                 if (!parentMessage) {
-                    return new DataResponse('Родительское сообщение не найдено');
+                    return new DataResponse<MessageEntity>('Родительское сообщение не найдено');
                     // return { success: false, data: 'Родительское сообщение не найдено' };
                 }
             }
@@ -45,9 +45,9 @@ export class MessagesService {
             await this.messageRepository.insert(messageEntity);
             await this.chatRepository.nativeUpdate({ id: chatId }, { countMessages: chat.countMessages });
 
-            return new DataResponse(messageEntity);
+            return new DataResponse<MessageEntity>(messageEntity);
         } else {
-            return new DataResponse('Чат не найден');
+            return new DataResponse<MessageEntity>('Чат не найден');
         }
     }
 
